@@ -46,7 +46,7 @@ cd ~/family-board
 
 The installer is idempotent — re-run it after any `git pull`. It:
 
-- installs Node 22, build tools and Chromium
+- installs Node 24, build tools and Chromium
 - `npm ci` and creates `.env` / `config.json` from the examples if missing
 - installs and starts the systemd units (server, nightly backup, watchdog)
 - registers `scripts/kiosk.sh` in the labwc (or wayfire) session autostart

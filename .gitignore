@@ -7,3 +7,6 @@ config.json
 .env
 backups/
 *.log
+
+# Dev-machine launch config: holds a Windows absolute path, not for the Pi.
+.claude/

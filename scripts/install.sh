@@ -26,9 +26,9 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
   ca-certificates curl git build-essential python3 sqlite3 chromium-browser
 
-if ! command -v node >/dev/null || [[ "$(node -v | cut -c2- | cut -d. -f1)" -lt 20 ]]; then
-  say "Installing Node.js 22 (NodeSource)"
-  curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+if ! command -v node >/dev/null || [[ "$(node -v | cut -c2- | cut -d. -f1)" -lt 22 ]]; then
+  say "Installing Node.js 24 (NodeSource)"
+  curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
   sudo apt-get install -y nodejs
 fi
 
