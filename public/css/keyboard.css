@@ -1,0 +1,44 @@
+/* On-screen keyboard. Docked to the bottom, always above the sheet, sized so a
+   kid's finger hits one key and not three. */
+
+.osk {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  padding: 10px;
+  background: var(--panel-2);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -10px 30px rgb(0 0 0 / 0.35);
+  z-index: 80;
+  touch-action: none;
+}
+
+.osk.is-open { display: block; }
+
+/* Lift the sheet so the field being typed into never sits under the keyboard. */
+body.osk-open .overlay { align-items: flex-start; padding-bottom: 46vh; }
+
+.osk-rows { display: flex; flex-direction: column; gap: 8px; }
+.osk-row { display: flex; justify-content: center; gap: 8px; }
+
+.osk-key {
+  flex: 1 1 0;
+  min-width: 56px;
+  max-width: 120px;
+  height: clamp(56px, 7.5vh, 84px);
+  font: inherit;
+  font-size: clamp(19px, 1.6vw, 28px);
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.osk-key:active { background: var(--accent); color: #fff; }
+.osk-key.is-active { background: var(--accent); color: #fff; }
+.osk-wide { flex: 1.4 1 0; max-width: 160px; }
+.osk-space { flex: 5 1 0; max-width: none; }
+.osk-done { flex: 1.6 1 0; max-width: 180px; background: var(--accent); border-color: transparent; color: #fff; }

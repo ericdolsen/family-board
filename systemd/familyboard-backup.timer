@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the Family Board backup nightly
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+# The Pi may be off at 03:15; run at the next boot instead of skipping a day.
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

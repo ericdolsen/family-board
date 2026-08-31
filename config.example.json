@@ -1,0 +1,39 @@
+{
+  "_comment": "Copy to config.json and edit. This file is safe to read by any device on the LAN, so keep secrets in .env instead.",
+  "boardName": "Family Board",
+  "timezone": "America/Denver",
+  "locale": "en-US",
+  "weekStartsOn": 0,
+
+  "members": [
+    { "id": "mom",   "name": "Mom",   "color": "#e0559a" },
+    { "id": "dad",   "name": "Dad",   "color": "#4a9de0" },
+    { "id": "kid1",  "name": "Kid 1", "color": "#4fbf7a" },
+    { "id": "kid2",  "name": "Kid 2", "color": "#e0a23c" },
+    { "id": "family","name": "Family","color": "#9b7fe0" }
+  ],
+
+  "calendars": [
+    {
+      "id": "REPLACE_WITH_GOOGLE_CALENDAR_ID",
+      "label": "Family",
+      "member": "family",
+      "enabled": true
+    }
+  ],
+
+  "display": {
+    "theme": "dark",
+    "autoTheme": true,
+    "dayStartsAt": "06:30",
+    "nightStartsAt": "21:00",
+    "nightDimPercent": 45,
+    "idleAfterMinutes": 0
+  },
+
+  "behavior": {
+    "clearDoneTodosAfterHours": 24,
+    "clearBoughtGroceriesAfterHours": 72,
+    "onScreenKeyboardMinWidth": 1100
+  }
+}

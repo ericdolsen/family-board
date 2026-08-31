@@ -1,0 +1,46 @@
+import { db, now } from '../db.js';
+import { env, loadConfig } from '../config.js';
+import { syncCalendars } from '../google/calendar.js';
+import { broadcast } from '../events.js';
+
+/**
+ * One in-process job loop. Two services would be tidier on paper and one more
+ * thing to fail at 2am on a Pi; keep it here until it earns its own process.
+ */
+export function startScheduler() {
+  const pollMs = Math.max(15, env.google.pollSeconds) * 1000;
+
+  const runCalendar = async () => {
+    try {
+      await syncCalendars();
+    } catch (err) {
+      console.error('[scheduler] calendar sync error:', err.message);
+    }
+  };
+
+  runCalendar();
+  setInterval(runCalendar, pollMs).unref();
+
+  // Housekeeping every 10 minutes: age out completed items so the board looks
+  // like a fresh whiteboard each morning.
+  const housekeeping = () => {
+    const cfg = loadConfig();
+    const t = now();
+    let touched = false;
+
+    const todoCutoff = t - (cfg.behavior.clearDoneTodosAfterHours || 24) * 3600000;
+    const todos = db.prepare('DELETE FROM todos WHERE done = 1 AND done_at IS NOT NULL AND done_at < ?').run(todoCutoff);
+    if (todos.changes) { broadcast('todos', 'cleared'); touched = true; }
+
+    const groceryCutoff = t - (cfg.behavior.clearBoughtGroceriesAfterHours || 72) * 3600000;
+    const grocery = db
+      .prepare('DELETE FROM grocery_items WHERE checked = 1 AND checked_at IS NOT NULL AND checked_at < ?')
+      .run(groceryCutoff);
+    if (grocery.changes) { broadcast('grocery', 'cleared'); touched = true; }
+
+    if (touched) console.log('[scheduler] housekeeping removed aged items');
+  };
+
+  housekeeping();
+  setInterval(housekeeping, 10 * 60 * 1000).unref();
+}

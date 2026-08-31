@@ -1,0 +1,10 @@
+[Unit]
+Description=Family Board nightly SQLite backup
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+# Set BACKUP_MIRROR to a USB stick or network mount for the second location.
+# Environment=BACKUP_MIRROR=/media/usb/family-board
+ExecStart=/usr/bin/node scripts/backup.js

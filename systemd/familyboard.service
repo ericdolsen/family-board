@@ -1,0 +1,25 @@
+[Unit]
+Description=Family Board server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=3
+# A wedged board should never take the Pi down with it.
+MemoryMax=512M
+# Hardening: the app only ever needs its own directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=@APP_DIR@/data @APP_DIR@/backups
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

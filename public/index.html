@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="color-scheme" content="dark light">
+  <title>Family Board</title>
+  <link rel="stylesheet" href="/css/board.css">
+  <link rel="stylesheet" href="/css/keyboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="board-name">Family Board</h1>
+    <div id="clock" class="clock"></div>
+    <div class="topbar-tools">
+      <span id="link-status" class="link-status" title="Connection to the board server"></span>
+      <button type="button" id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <main id="board" class="board"></main>
+
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true"></div>
+  <div id="dim" class="dim" aria-hidden="true"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
