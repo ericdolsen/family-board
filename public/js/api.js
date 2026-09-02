@@ -44,6 +44,7 @@ export const api = {
 
   notes: {
     list: () => get('/api/notes'),
+    get: (id) => get(`/api/notes/${id}`),
     add: (note) => post('/api/notes', note),
     update: (id, fields) => patch(`/api/notes/${id}`, fields),
     remove: (id) => del(`/api/notes/${id}`),

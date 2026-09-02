@@ -149,6 +149,23 @@ function applyTheme() {
   document.getElementById('dim').style.opacity = String(dim);
 }
 
+/**
+ * The kiosk tab otherwise runs for months. A reload in the small hours resets
+ * whatever Chromium — or this code — has slowly accumulated, at a time nobody
+ * is mid-edit. Kiosk only: phones don't need it and shouldn't get it.
+ */
+function scheduleNightlyReload() {
+  const at = config.display.nightlyReloadAt;
+  if (!at || !document.documentElement.classList.contains('kiosk')) return;
+
+  const [h, m] = String(at).split(':').map(Number);
+  const next = new Date();
+  next.setHours(h, m || 0, 0, 0);
+  if (next <= new Date()) next.setDate(next.getDate() + 1);
+
+  setTimeout(() => location.reload(), next - Date.now());
+}
+
 function setupTheme() {
   const btn = document.getElementById('theme-toggle');
   btn.addEventListener('click', () => {
@@ -204,6 +221,7 @@ async function main() {
 
   startClock();
   setupTheme();
+  scheduleNightlyReload();
 
   // Kid-proofing: a wall board should never end up somewhere it can't come back
   // from. Chromium kiosk already blocks most of this; belt and braces.

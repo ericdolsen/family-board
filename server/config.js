@@ -41,6 +41,7 @@ const DEFAULTS = {
     nightStartsAt: '21:00',
     nightDimPercent: 45,
     idleAfterMinutes: 0,
+    nightlyReloadAt: '04:00',
   },
   behavior: {
     clearDoneTodosAfterHours: 24,

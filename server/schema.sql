@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS meals (
 CREATE TABLE IF NOT EXISTS notes (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   kind        TEXT    NOT NULL DEFAULT 'text',   -- 'text' | 'drawing'
-  body        TEXT    NOT NULL DEFAULT '',       -- text content, or PNG data URL for drawings
+  body        TEXT    NOT NULL DEFAULT '',       -- text content, or full-size PNG data URL for drawings
+  thumb       TEXT,                              -- small PNG data URL; what the board tile renders
   color       TEXT    NOT NULL DEFAULT 'yellow',
   member      TEXT,
   position    REAL    NOT NULL DEFAULT 0,

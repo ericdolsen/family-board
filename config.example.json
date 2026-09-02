@@ -28,7 +28,8 @@
     "dayStartsAt": "06:30",
     "nightStartsAt": "21:00",
     "nightDimPercent": 45,
-    "idleAfterMinutes": 0
+    "idleAfterMinutes": 0,
+    "nightlyReloadAt": "04:00"
   },
 
   "behavior": {

@@ -16,6 +16,14 @@ db.pragma('busy_timeout = 5000');
 
 db.exec(fs.readFileSync(path.join(ROOT, 'server', 'schema.sql'), 'utf8'));
 
+// Additive migrations for databases created before a column existed. schema.sql
+// only ever CREATEs IF NOT EXISTS, so new columns have to be bolted on here.
+function ensureColumn(table, column, definition) {
+  const has = db.pragma(`table_info(${table})`).some((c) => c.name === column);
+  if (!has) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+ensureColumn('notes', 'thumb', 'TEXT');
+
 export const now = () => Date.now();
 
 export function getSetting(key, fallback = null) {

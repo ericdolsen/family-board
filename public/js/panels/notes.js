@@ -3,15 +3,33 @@ import { openSheet, askText, confirmAction, escapeHtml } from '../ui.js';
 
 const COLORS = ['yellow', 'blue', 'green', 'pink', 'plain'];
 
+// Full-size drawings are only ever decoded one at a time, in the editor. The
+// board tile shows a thumbnail: at 400px wide it decodes to ~0.4 MB instead of
+// ~2.5 MB, which is the difference between fifty drawings costing 20 MB and
+// costing 125 MB in a browser tab that runs for months.
+const DRAW_W = 1000;
+const DRAW_H = 620;
+const THUMB_W = 400;
+
+function thumbnailOf(canvas) {
+  const small = document.createElement('canvas');
+  small.width = THUMB_W;
+  small.height = Math.round((THUMB_W * DRAW_H) / DRAW_W);
+  const ctx = small.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(canvas, 0, 0, small.width, small.height);
+  return small.toDataURL('image/png');
+}
+
 /** Finger-drawing sheet. Pointer events cover touch, pen and mouse alike. */
 function drawingSheet(existing = null) {
   return new Promise((resolve) => {
     const wrap = document.createElement('div');
     wrap.className = 'draw-wrap';
     wrap.innerHTML = `
-      <canvas class="draw-canvas" width="1000" height="620"></canvas>
+      <canvas class="draw-canvas" width="${DRAW_W}" height="${DRAW_H}"></canvas>
       <div class="draw-tools">
-        <button type="button" class="btn btn-small" data-tool="pen">Pen</button>
+        <button type="button" class="btn btn-small is-on" data-tool="pen">Pen</button>
         <button type="button" class="btn btn-small" data-tool="eraser">Eraser</button>
         <button type="button" class="btn btn-small btn-quiet" data-tool="clear">Clear</button>
       </div>`;
@@ -88,7 +106,11 @@ function drawingSheet(existing = null) {
       wide: true,
       actions: [
         { label: 'Cancel', className: 'btn-quiet', onClick: () => finish(null) },
-        { label: 'Save', className: 'btn-primary', onClick: () => finish(canvas.toDataURL('image/png')) },
+        {
+          label: 'Save',
+          className: 'btn-primary',
+          onClick: () => finish({ body: canvas.toDataURL('image/png'), thumb: thumbnailOf(canvas) }),
+        },
       ],
       onClose: () => finish(null),
     });
@@ -111,7 +133,7 @@ export const notesPanel = {
                 <button type="button" class="note-open" data-action="edit">
                   ${
                     note.kind === 'drawing'
-                      ? `<img class="note-img" src="${note.body}" alt="Drawing">`
+                      ? `<img class="note-img" src="${note.thumb || ''}" alt="Drawing">`
                       : `<span class="note-text">${escapeHtml(note.body)}</span>`
                   }
                 </button>
@@ -128,29 +150,31 @@ export const notesPanel = {
       const btn = ev.target.closest('[data-action]');
       if (!btn) return;
       const id = btn.closest('[data-id]').dataset.id;
-      const notes = await api.notes.list();
-      const note = notes.find((n) => String(n.id) === id);
-      if (!note) return;
 
-      if (btn.dataset.action === 'edit') {
-        if (note.kind === 'drawing') {
-          const png = await drawingSheet(note);
-          if (png) await api.notes.update(id, { body: png });
-        } else {
-          const text = await askText({
-            title: 'Edit note',
-            value: note.body,
-            multiline: true,
-            submitLabel: 'Save',
-          });
-          if (text) await api.notes.update(id, { body: text });
-        }
-      } else if (btn.dataset.action === 'delete') {
+      if (btn.dataset.action === 'delete') {
         const ok = await confirmAction({
           title: 'Delete this note?',
           message: 'The note will be removed for good.',
         });
         if (ok) await api.notes.remove(id);
+        return;
+      }
+
+      // Only now fetch the full-size body, for this one note.
+      const note = await api.notes.get(id).catch(() => null);
+      if (!note) return;
+
+      if (note.kind === 'drawing') {
+        const result = await drawingSheet(note);
+        if (result) await api.notes.update(id, result);
+      } else {
+        const text = await askText({
+          title: 'Edit note',
+          value: note.body,
+          multiline: true,
+          submitLabel: 'Save',
+        });
+        if (text) await api.notes.update(id, { body: text });
       }
     });
   },
@@ -181,8 +205,8 @@ export const notesPanel = {
         await api.notes.add({ kind: 'text', body: text, color: COLORS[Math.floor(Math.random() * 4)] });
       }
     } else if (choice === 'drawing') {
-      const png = await drawingSheet();
-      if (png) await api.notes.add({ kind: 'drawing', body: png, color: 'plain' });
+      const result = await drawingSheet();
+      if (result) await api.notes.add({ kind: 'drawing', color: 'plain', ...result });
     }
   },
 };

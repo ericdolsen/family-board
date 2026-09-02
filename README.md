@@ -134,6 +134,7 @@ whenever it changes, so editing it does **not** need a restart.
 | `calendars` | Google calendar ids to display, each mapped to a member colour. |
 | `display.autoTheme` | Switch light/dark on the day/night schedule. |
 | `display.nightDimPercent` | How far to dim after `nightStartsAt` (a black overlay — works on any TV over HDMI, where backlight control usually doesn't). |
+| `display.nightlyReloadAt` | When the kiosk tab reloads itself each night (`"04:00"`). Empty string disables it. Phones are never reloaded. |
 | `behavior.clearDoneTodosAfterHours` | How long checked-off to-dos linger before housekeeping removes them. |
 | `behavior.clearBoughtGroceriesAfterHours` | Same for the "recently bought" shelf. |
 | `behavior.onScreenKeyboardMinWidth` | Below this width the native keyboard is used instead (phones and tablets). |
@@ -170,6 +171,7 @@ phones on the LAN ──────────────┘   (same app, res
 | Server alive but wedged | `familyboard-watchdog.timer` → three failed `/api/healthz` probes → restart |
 | Chromium exits | the relaunch loop in `scripts/kiosk.sh` |
 | Page wedged / stale | the page reloads itself after 5 minutes with no event stream |
+| Slow leaks in a months-old tab | the kiosk reloads itself nightly at `display.nightlyReloadAt` |
 | Power loss | SQLite WAL + `Persistent=true` on the backup timer |
 
 ### Backups
