@@ -15,7 +15,9 @@ systemRouter.get('/config', (req, res) => {
     locale: cfg.locale,
     weekStartsOn: cfg.weekStartsOn,
     members: cfg.members,
-    calendars: cfg.calendars.filter((c) => c.enabled !== false).map(({ id, label, member }) => ({ id, label, member })),
+    calendars: cfg.calendars
+      .filter((c) => c.enabled !== false)
+      .map(({ id, label, member, color }) => ({ id, label, member, color })),
     display: cfg.display,
     behavior: cfg.behavior,
   });

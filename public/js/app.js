@@ -24,8 +24,11 @@ const ctx = {
   memberById(id) {
     return config.members.find((m) => m.id === id) || null;
   },
+  // A calendar is coloured by its member, or by its own `color` when it
+  // belongs to nobody (holidays, school, the trash schedule).
   calendarColor(calendarId) {
     const cal = config.calendars.find((c) => c.id === calendarId);
+    if (cal?.color) return cal.color;
     const member = cal && config.members.find((m) => m.id === cal.member);
     return member?.color || 'var(--accent)';
   },

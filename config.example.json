@@ -19,6 +19,12 @@
       "label": "Family",
       "member": "family",
       "enabled": true
+    },
+    {
+      "id": "en.usa#holiday@group.v.calendar.google.com",
+      "label": "US Holidays",
+      "color": "#7d8594",
+      "enabled": true
     }
   ],
 
