@@ -76,11 +76,16 @@ You need an OAuth client. Twenty minutes of clicking, once.
 
 1. <https://console.cloud.google.com> → create a project (e.g. "Family Board").
 2. **APIs & Services → Library** → enable **Google Calendar API**.
-3. **APIs & Services → OAuth consent screen** → External → fill in the app name
-   and your email. Add yourself (or the board account) under **Test users**.
-   Leave it in Testing; you never need to publish it.
-4. **Credentials → Create credentials → OAuth client ID → Desktop app**.
-5. Copy the client id and secret into `.env`.
+3. **Google Auth Platform** (older consoles call it *OAuth consent screen*) →
+   configure: External, an app name, your email. Add the Calendar scope if it
+   asks.
+4. **Publish the app to "In production".** Do not leave it in Testing: Google
+   expires refresh tokens after 7 days in Testing, and the board would silently
+   lose its calendar every week. Production without verification just means
+   Google shows an "unverified app" warning during the one-time link, which you
+   click through (*Advanced → Go to Family Board*).
+5. **Clients → Create client → Desktop app**.
+6. Copy the client id and secret into `.env`.
 
 Then link the account:
 
