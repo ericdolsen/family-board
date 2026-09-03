@@ -105,6 +105,13 @@ else
   echo "! No labwc or wayfire config found. Add scripts/kiosk.sh to your session autostart by hand."
 fi
 
+# Turn off Pi OS's idle screen blanking (it runs swayidle under labwc/wayfire
+# and would dim the board after ~10 minutes). Uses the same switch as
+# raspi-config's "Screen Blanking" menu; 1 = disable.
+if command -v raspi-config >/dev/null; then
+  sudo raspi-config nonint do_blanking 1 || echo "! raspi-config could not disable screen blanking — do it via raspi-config > Display."
+fi
+
 # Stop the text console blanking behind the browser.
 if ! grep -q 'consoleblank=0' /boot/firmware/cmdline.txt 2>/dev/null; then
   sudo sed -i '1 s|$| consoleblank=0|' /boot/firmware/cmdline.txt || \
