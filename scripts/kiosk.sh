@@ -36,6 +36,7 @@ while true; do
 
   "$BROWSER" \
     --kiosk \
+    --touch-events=enabled \
     --app="$URL" \
     --user-data-dir="$PROFILE" \
     --ozone-platform=wayland \
