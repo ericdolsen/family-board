@@ -236,6 +236,8 @@ html, body {
 }
 
 .tag-tonight { color: #fff; background: var(--accent); }
+/* Plain fallback first: BrightSign's Chromium 87 has no color-mix(). */
+.meal.is-tonight { background: rgb(90 169 240 / 0.14); }
 .meal.is-tonight { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
 .empty { padding: 1em 0.5em; color: var(--text-dim); }
