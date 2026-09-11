@@ -203,7 +203,8 @@ export const calendarPanel = {
   channel: 'calendar',
   addLabel: 'Add event',
 
-  state: { view: 'month', anchor: new Date() },
+  // Phones open on the agenda: a month grid at 375px wide is dots, not words.
+  state: { view: window.innerWidth < 900 ? 'agenda' : 'month', anchor: new Date() },
 
   async refresh(body, ctx) {
     const { view, anchor } = this.state;

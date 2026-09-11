@@ -550,10 +550,32 @@ html, body {
     grid-template-areas: 'calendar' 'todos' 'grocery' 'meals' 'notes';
   }
 
-  .panel { min-height: 46vh; }
+  /* Panels size to their content; nobody wants to scroll past an empty half-screen. */
+  .panel { min-height: auto; }
+  .panel-body { max-height: 55vh; }
+
+  .topbar h1 { font-size: 1.1em; }
+  .clock-time { font-size: var(--font-lg); white-space: nowrap; }
   .clock-date { display: none; }
+
+  /* Calendar controls wrap onto two rows instead of clipping. */
+  .cal-bar { flex-wrap: wrap; }
+  .cal-views { margin-left: 0; width: 100%; }
+  .cal-views .btn { flex: 1; }
+
+  /* Seven columns of truncated text is noise on a phone: month cells show a
+     dot per event, and the day sheet has the words. Agenda is the default. */
   .cal-grid, .cal-week { height: auto; }
-  .cal-cell { min-height: 76px; }
+  .cal-cell { min-height: 56px; }
+  .cal-cell .cal-events { flex-direction: row; flex-wrap: wrap; gap: 3px; }
+  .cal-cell .cal-chip {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0;
+  }
+  .cal-cell .cal-more { display: none; }
 }
 
 /* Kiosk only: the IR frame leaves a mouse pointer parked wherever the last
