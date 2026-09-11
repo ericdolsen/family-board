@@ -70,6 +70,27 @@ familyboard` plus a tap on the board is enough, or just reboot.
 
 ---
 
+## Alternative display: a BrightSign-based panel
+
+The reference build drives a TV from the Pi's HDMI port. If the display is a
+commercial panel with a **built-in BrightSign player** (e.g. a Bluefin
+"BrightSign Built-In" with an XT1144-PP), its touch glass is wired to the
+BrightSign, not to any external port — so the BrightSign has to be the browser.
+The Pi still runs everything; the panel just loads it over the LAN.
+
+- Give the Pi a **DHCP reservation**. The panel's presentation hard-codes the URL.
+- In BrightAuthor:connected, make a presentation with one full-screen **HTML5**
+  item pointing at `http://<pi-ip>:8080/?kiosk=1`, with mouse/touch events
+  enabled. Publish it to the player (BSN.cloud trial or Local Network mode).
+- Series 4 players (XT1144) run **Chromium 87**; the frontend is written to
+  stay within that.
+- Once published, the panel never needs republishing: every update comes from
+  the Pi. A lapsed cloud subscription only removes the ability to push a *new*
+  presentation; the existing one keeps playing from the SD card.
+- The Pi's own kiosk session is then unused. It's harmless, but can be turned
+  off by removing the `family-board kiosk` lines from
+  `~/.config/labwc/autostart` on the Pi.
+
 ## Google Calendar setup
 
 You need an OAuth client. Twenty minutes of clicking, once.
