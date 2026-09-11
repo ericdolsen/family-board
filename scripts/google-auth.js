@@ -61,15 +61,20 @@ const server = http.createServer(async (req, res) => {
     console.log(`\nToken saved to ${env.google.tokenPath}\n`);
 
     // Print calendar ids so config.json can be filled in without hunting
-    // through the Google Calendar settings UI.
-    const { data } = await client.request({
-      url: 'https://www.googleapis.com/calendar/v3/users/me/calendarList',
-    });
-    console.log('Calendars this account can see — copy the id into config.json:\n');
-    for (const cal of data.items || []) {
-      console.log(`  ${cal.summary}${cal.primary ? ' (primary)' : ''}`);
-      console.log(`    id: ${cal.id}`);
-      console.log(`    access: ${cal.accessRole}\n`);
+    // through the Google Calendar settings UI. Listing calendars needs a
+    // broader scope than editing events does, so this part is best-effort.
+    try {
+      const { data } = await client.request({
+        url: 'https://www.googleapis.com/calendar/v3/users/me/calendarList',
+      });
+      console.log('Calendars this account can see — copy the id into config.json:\n');
+      for (const cal of data.items || []) {
+        console.log(`  ${cal.summary}${cal.primary ? ' (primary)' : ''}`);
+        console.log(`    id: ${cal.id}`);
+        console.log(`    access: ${cal.accessRole}\n`);
+      }
+    } catch {
+      console.log('(Could not list calendars with this scope — fine if config.json already has the ids.)');
     }
   } catch (err) {
     console.error('Token exchange failed:', err.message);
