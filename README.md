@@ -8,10 +8,33 @@ to-dos, groceries, meals we can make, notes**. Tap any section title to blow it
 up full screen. Everything is stored locally in SQLite, so the board keeps
 working when the internet doesn't — only the sync features degrade.
 
-**Phase 1 (this):** the whole board, local lists, on-screen keyboard, read-only
+**Phase 1 (done):** the whole board, local lists, on-screen keyboard, read-only
 Google Calendar, kiosk install.
-**Phase 2:** Google Calendar write-back, to-do app sync, phone layout polish.
-**Phase 3:** Alexa grocery bridge, idle/photo mode, drawing polish.
+**Phase 2 (in progress):** Google Calendar write-back ✔, the shared doodle
+board ✔, to-do app sync, phone layout polish.
+**Phase 3:** Alexa grocery bridge, idle/photo mode.
+
+### Adding events from the board
+
+Tap **+** on the calendar (or a day, then *Add event*). The form is tap-only:
+title on the on-screen keyboard, a day stepper, an *All day* toggle, and
+±15-minute steppers for start and end (moving the start keeps the duration).
+Tapping an existing event edits or deletes it. Calendars marked
+`"readonly": true` in `config.json` (holidays) can be viewed but not edited.
+
+Writes land in the local cache instantly — shown with a dashed outline and a
+*syncing…* tag — and reach Google through a queue that retries until it
+succeeds. If the link is down or the token lacks the `calendar.events` scope,
+nothing is lost: `/api/calendar/status` reports `queued` and the last error,
+and the event stays on the board until Google confirms it.
+
+### The doodle
+
+The **Doodle** button in the top bar (it shows a thumbnail of the current
+drawing) opens the shared canvas: six markers, an eraser, three widths, Clear
+(confirmed), and a full-screen toggle. It saves a second after each stroke and
+every device sees the same drawing. It's the part of the whiteboard that was
+never about the calendar.
 
 ---
 
