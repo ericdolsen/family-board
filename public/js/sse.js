@@ -18,8 +18,8 @@ export function startStream(onStatus) {
     source.addEventListener('open', () => onStatus?.(true));
 
     source.addEventListener('update', (ev) => {
-      const { channel } = JSON.parse(ev.data);
-      for (const fn of handlers.get(channel) || []) fn();
+      const data = JSON.parse(ev.data);
+      for (const fn of handlers.get(data.channel) || []) fn(data);
     });
 
     source.addEventListener('error', () => {

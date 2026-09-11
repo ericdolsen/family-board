@@ -1,6 +1,7 @@
 import { api } from './api.js';
 import { startStream, onChannel } from './sse.js';
 import { initKeyboard } from './keyboard.js';
+import { initDoodle } from './doodle.js';
 import { openSheet, toast, escapeHtml } from './ui.js';
 import { calendarPanel } from './panels/calendar.js';
 import { todosPanel } from './panels/todos.js';
@@ -225,6 +226,7 @@ async function main() {
   startClock();
   setupTheme();
   scheduleNightlyReload();
+  initDoodle();
 
   // Kid-proofing: a wall board should never end up somewhere it can't come back
   // from. Chromium kiosk already blocks most of this; belt and braces.

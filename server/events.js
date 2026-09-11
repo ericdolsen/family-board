@@ -11,8 +11,8 @@ export function addClient(res) {
   res.on('close', () => clients.delete(res));
 }
 
-export function broadcast(channel, action = 'changed') {
-  const frame = `event: update\ndata: ${JSON.stringify({ channel, action, at: Date.now() })}\n\n`;
+export function broadcast(channel, action = 'changed', extra = {}) {
+  const frame = `event: update\ndata: ${JSON.stringify({ ...extra, channel, action, at: Date.now() })}\n\n`;
   for (const res of clients) {
     try {
       res.write(frame);

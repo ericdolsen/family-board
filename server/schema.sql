@@ -58,6 +58,15 @@ CREATE TABLE IF NOT EXISTS notes (
   updated_at  INTEGER NOT NULL
 );
 
+-- The shared whiteboard scrawl. One row today; the table shape allows pages
+-- later without a migration.
+CREATE TABLE IF NOT EXISTS doodles (
+  id          INTEGER PRIMARY KEY,
+  png         TEXT    NOT NULL DEFAULT '',   -- full-size PNG data URL, '' when blank
+  thumb       TEXT,                          -- small PNG data URL for the toolbar button
+  updated_at  INTEGER NOT NULL
+);
+
 -- Read-through cache of Google Calendar. Safe to delete entirely; it refills.
 CREATE TABLE IF NOT EXISTS calendar_events (
   id           TEXT    NOT NULL,

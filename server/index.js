@@ -7,6 +7,7 @@ import { groceryRouter } from './routes/grocery.js';
 import { mealsRouter } from './routes/meals.js';
 import { notesRouter } from './routes/notes.js';
 import { calendarRouter } from './routes/calendar.js';
+import { doodleRouter } from './routes/doodle.js';
 import { systemRouter } from './routes/system.js';
 import { startScheduler } from './sync/scheduler.js';
 
@@ -26,6 +27,7 @@ app.use('/api/grocery', groceryRouter);
 app.use('/api/meals', mealsRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/calendar', calendarRouter);
+app.use('/api/doodle', doodleRouter);
 app.use('/api', systemRouter);
 
 app.use(express.static(path.join(ROOT, 'public'), { maxAge: 0 }));
