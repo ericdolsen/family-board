@@ -28,14 +28,28 @@ export function newClient() {
 }
 
 let cachedClient = null;
+let cachedMtime = 0;
+
+function tokenMtime() {
+  try {
+    return fs.statSync(env.google.tokenPath).mtimeMs;
+  } catch {
+    return 0;
+  }
+}
 
 /**
  * Returns an authorised client, or null when the board hasn't been linked yet.
  * Never throws on a missing token — a board with no calendar must still boot.
+ *
+ * The client is rebuilt whenever the token file changes on disk, so re-running
+ * `npm run google-auth` (a new scope, a new account) takes effect without a
+ * service restart.
  */
 export function getAuthorizedClient() {
-  if (cachedClient) return cachedClient;
-  if (!hasCredentials() || !hasToken()) return null;
+  const mtime = tokenMtime();
+  if (cachedClient && mtime === cachedMtime) return cachedClient;
+  if (!hasCredentials() || !mtime) return null;
 
   const client = newClient();
   client.setCredentials(JSON.parse(fs.readFileSync(env.google.tokenPath, 'utf8')));
@@ -45,8 +59,10 @@ export function getAuthorizedClient() {
   client.on('tokens', (tokens) => {
     const current = JSON.parse(fs.readFileSync(env.google.tokenPath, 'utf8'));
     saveToken({ ...current, ...tokens });
+    cachedMtime = tokenMtime();
   });
 
   cachedClient = client;
+  cachedMtime = mtime;
   return client;
 }

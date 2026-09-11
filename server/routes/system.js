@@ -17,7 +17,7 @@ systemRouter.get('/config', (req, res) => {
     members: cfg.members,
     calendars: cfg.calendars
       .filter((c) => c.enabled !== false)
-      .map(({ id, label, member, color }) => ({ id, label, member, color })),
+      .map(({ id, label, member, color, readonly }) => ({ id, label, member, color, readonly: Boolean(readonly) })),
     display: cfg.display,
     behavior: cfg.behavior,
   });

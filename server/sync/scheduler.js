@@ -1,6 +1,6 @@
 import { db, now } from '../db.js';
 import { env, loadConfig } from '../config.js';
-import { syncCalendars } from '../google/calendar.js';
+import { syncCalendars, processQueue } from '../google/calendar.js';
 import { broadcast } from '../events.js';
 
 /**
@@ -20,6 +20,19 @@ export function startScheduler() {
 
   runCalendar();
   setInterval(runCalendar, pollMs).unref();
+
+  // Outbound writes retry on their own cadence so a flaky link doesn't make
+  // a tapped-in event wait a whole poll interval.
+  const drain = async () => {
+    const waiting = db.prepare("SELECT COUNT(*) AS n FROM sync_queue WHERE target = 'google-calendar'").get().n;
+    if (!waiting) return;
+    try {
+      await processQueue();
+    } catch (err) {
+      console.error('[scheduler] queue error:', err.message);
+    }
+  };
+  setInterval(drain, 20 * 1000).unref();
 
   // Housekeeping every 10 minutes: age out completed items so the board looks
   // like a fresh whiteboard each morning.

@@ -23,6 +23,8 @@ function ensureColumn(table, column, definition) {
   if (!has) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
 }
 ensureColumn('notes', 'thumb', 'TEXT');
+// NULL = in sync with Google; 'create' | 'update' | 'delete' = waiting to go out.
+ensureColumn('calendar_events', 'pending', 'TEXT');
 
 export const now = () => Date.now();
 

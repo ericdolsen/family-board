@@ -634,3 +634,40 @@ html.kiosk, html.kiosk * { cursor: none !important; }
   .doodle--floating { inset: 2vh 2vw; }
   .doodle-btn .doodle-label { display: none; }
 }
+
+/* ---------- event form ---------- */
+
+.event-form { gap: 0.5em; }
+.big-input--sm { min-height: var(--tap); font-size: 1em; }
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.stepper .btn { min-width: var(--tap); padding: 0 0.9em; }
+.stepper-label { width: 3.2em; color: var(--text-dim); }
+.stepper-value { flex: 1; text-align: center; font-size: var(--font-lg); font-weight: 650; }
+.time-rows { display: flex; flex-direction: column; gap: 0.5em; }
+.time-rows[hidden] { display: none; }
+
+.cal-chip.is-pending { opacity: 0.7; outline: 2px dashed rgb(255 255 255 / 0.7); outline-offset: -2px; }
+
+/* The li carries the colour bar; the button inside carries the columns. */
+.day-list li:not(:empty) { display: block; padding: 0; }
+
+.day-event {
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 0.5em;
+  align-items: baseline;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0.3em 0.2em;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  background: none;
+  border: 0;
+}

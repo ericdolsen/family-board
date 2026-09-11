@@ -54,5 +54,12 @@ export const api = {
     events: (from, to) => get(`/api/calendar/events?from=${from}&to=${to}`),
     status: () => get('/api/calendar/status'),
     sync: () => post('/api/calendar/sync'),
+    get: (calendarId, id) =>
+      get(`/api/calendar/events/${encodeURIComponent(calendarId)}/${encodeURIComponent(id)}`),
+    create: (event) => post('/api/calendar/events', event),
+    update: (calendarId, id, fields) =>
+      patch(`/api/calendar/events/${encodeURIComponent(calendarId)}/${encodeURIComponent(id)}`, fields),
+    remove: (calendarId, id) =>
+      del(`/api/calendar/events/${encodeURIComponent(calendarId)}/${encodeURIComponent(id)}`),
   },
 };
