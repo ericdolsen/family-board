@@ -1,6 +1,7 @@
 import { db, now } from '../db.js';
 import { env, loadConfig } from '../config.js';
 import { syncCalendars, processQueue } from '../google/calendar.js';
+import { syncTodos, todoistEnabled } from '../todoist/sync.js';
 import { broadcast } from '../events.js';
 
 /**
@@ -33,6 +34,16 @@ export function startScheduler() {
     }
   };
   setInterval(drain, 20 * 1000).unref();
+
+  // Todoist: one request per cycle carries both directions. Silent no-op
+  // until TODOIST_TOKEN is set.
+  if (todoistEnabled()) {
+    const runTodoist = () => syncTodos().catch((err) => console.error('[scheduler] todoist:', err.message));
+    runTodoist();
+    setInterval(runTodoist, Math.max(15, loadConfig().todo.pollSeconds) * 1000).unref();
+  } else {
+    console.log('[scheduler] Todoist sync off (no TODOIST_TOKEN)');
+  }
 
   // Housekeeping every 10 minutes: age out completed items so the board looks
   // like a fresh whiteboard each morning.

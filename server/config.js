@@ -25,6 +25,9 @@ export const env = {
       .filter(Boolean),
     pollSeconds: Number(process.env.CALENDAR_POLL_SECONDS || 60),
   },
+  todoist: {
+    token: (process.env.TODOIST_TOKEN || '').trim(),
+  },
 };
 
 const DEFAULTS = {
@@ -47,6 +50,10 @@ const DEFAULTS = {
     clearDoneTodosAfterHours: 24,
     clearBoughtGroceriesAfterHours: 72,
     onScreenKeyboardMinWidth: 1100,
+  },
+  todo: {
+    todoistProject: 'Family',
+    pollSeconds: 30,
   },
 };
 
@@ -77,6 +84,7 @@ export function loadConfig() {
       ...raw,
       display: { ...DEFAULTS.display, ...(raw.display || {}) },
       behavior: { ...DEFAULTS.behavior, ...(raw.behavior || {}) },
+      todo: { ...DEFAULTS.todo, ...(raw.todo || {}) },
     };
     cached = { mtime: stat.mtimeMs, value };
   } catch (err) {

@@ -28,6 +28,30 @@ succeeds. If the link is down or the token lacks the `calendar.events` scope,
 nothing is lost: `/api/calendar/status` reports `queued` and the last error,
 and the event stays on the board until Google confirms it.
 
+### To-do sync with Todoist
+
+The to-do list syncs two ways with one shared Todoist project, so anyone can
+add or tick things off from the Todoist app on their phone and the board
+follows within `todo.pollSeconds` (30 s), and vice versa.
+
+1. Make a free Todoist account for whoever "owns" the list (the board's
+   dedicated Google account is a fine choice), then **Settings → Integrations
+   → Developer → API token**. Put it in `.env` as `TODOIST_TOKEN`.
+2. `config.json` → `todo.todoistProject` names the project (default
+   `Family`). If it doesn't exist the board creates it on first sync; then
+   share it from the Todoist app with each family member.
+
+How it maps: board item ↔ Todoist task. Ticking off on the board completes
+the task on Todoist; deleting on the board deletes it there. Completing on
+Todoist ticks it off here. The board's daily housekeeping only clears its own
+copy of done items — Todoist keeps its history. Member colours are local to
+the board (Todoist assignees aren't mapped). Items that existed before the
+token was added are sent up once.
+
+Nothing is lost when Todoist is unreachable: unsent changes stay marked and go
+on the next cycle. `/api/todos/status` shows `pendingPush` and the last error.
+Leave `TODOIST_TOKEN` blank and the list is simply local, as in Phase 1.
+
 ### The doodle
 
 The **Doodle** button in the top bar (it shows a thumbnail of the current

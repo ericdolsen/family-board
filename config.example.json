@@ -59,5 +59,9 @@
     "clearDoneTodosAfterHours": 24,
     "clearBoughtGroceriesAfterHours": 72,
     "onScreenKeyboardMinWidth": 1100
+  },
+  "todo": {
+    "todoistProject": "Family",
+    "pollSeconds": 30
   }
 }
