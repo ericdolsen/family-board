@@ -98,10 +98,21 @@ function cased(key, typed) {
 export function suggest(typed, limit = 4) {
   const w = String(typed || '').toLowerCase();
   if (w.length < 2 || !words.length) return [];
-  const out = [];
   const seen = new Set([w]);
   const known = rank.has(w);
 
+  // Completions, in rank order (the list is already sorted by rank).
+  const completions = [];
+  for (const key of words) {
+    if (completions.length >= limit) break;
+    if (key.length > w.length && key.startsWith(w) && !seen.has(key)) {
+      seen.add(key);
+      completions.push({ word: cased(key, typed), fix: false });
+    }
+  }
+
+  // Corrections, only when what's typed isn't itself a word.
+  const corrections = [];
   if (!known && w.length >= 3) {
     const max = w.length >= 6 ? 2 : 1;
     const candidates = [];
@@ -113,21 +124,16 @@ export function suggest(typed, limit = 4) {
     }
     candidates.sort((a, b) => a.d - b.d || a.r - b.r);
     for (const c of candidates) {
-      if (out.length >= limit) break;
+      if (corrections.length >= limit) break;
       if (seen.has(c.key)) continue;
       seen.add(c.key);
-      out.push({ word: cased(c.key, typed), fix: true });
+      corrections.push({ word: cased(c.key, typed), fix: true });
     }
   }
 
-  // Completions, in rank order (the list is already sorted by rank).
-  for (const key of words) {
-    if (out.length >= limit) break;
-    if (key.length > w.length && key.startsWith(w) && !seen.has(key)) {
-      seen.add(key);
-      out.push({ word: cased(key, typed), fix: false });
-    }
-  }
-
-  return out;
+  // "Dext" is on its way to "Dexter", not a misspelling of "next": a prefix
+  // that completes to a real word leads, corrections follow. With nothing to
+  // complete (tomorow, Wensday) the corrections take the whole strip.
+  const lead = completions.slice(0, corrections.length ? 2 : limit);
+  return [...lead, ...corrections, ...completions.slice(lead.length)].slice(0, limit);
 }
