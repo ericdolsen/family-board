@@ -1,5 +1,6 @@
 import { api } from '../api.js';
 import { openSheet, askText, confirmAction, escapeHtml } from '../ui.js';
+import { attachInk } from '../ink.js';
 
 const COLORS = ['yellow', 'blue', 'green', 'pink', 'plain'];
 
@@ -48,37 +49,9 @@ function drawingSheet(existing = null) {
     }
 
     let tool = 'pen';
-    let drawing = false;
-
-    const point = (ev) => {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: ((ev.clientX - rect.left) / rect.width) * canvas.width,
-        y: ((ev.clientY - rect.top) / rect.height) * canvas.height,
-      };
-    };
-
-    canvas.addEventListener('pointerdown', (ev) => {
-      drawing = true;
-      canvas.setPointerCapture(ev.pointerId);
-      const p = point(ev);
-      ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : '#1b1b1b';
-      ctx.lineWidth = tool === 'eraser' ? 40 : 5;
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
+    attachInk(canvas, {
+      style: () => ({ color: tool === 'eraser' ? '#ffffff' : '#1b1b1b', width: tool === 'eraser' ? 40 : 5 }),
     });
-
-    canvas.addEventListener('pointermove', (ev) => {
-      if (!drawing) return;
-      const p = point(ev);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-    });
-
-    const stop = () => { drawing = false; };
-    canvas.addEventListener('pointerup', stop);
-    canvas.addEventListener('pointercancel', stop);
-    canvas.addEventListener('pointerleave', stop);
 
     wrap.addEventListener('click', (ev) => {
       const btn = ev.target.closest('[data-tool]');

@@ -42,3 +42,27 @@ body.osk-open .overlay { align-items: flex-start; padding-bottom: 46vh; }
 .osk-wide { flex: 1.4 1 0; max-width: 160px; }
 .osk-space { flex: 5 1 0; max-width: none; }
 .osk-done { flex: 1.6 1 0; max-width: 180px; background: var(--accent); border-color: transparent; color: #fff; }
+
+/* Suggestion strip: completions, and corrections (emphasised) for a word the
+   dictionary doesn't know. Tapping one replaces the word being typed. */
+.osk-suggest {
+  display: flex;
+  gap: 8px;
+  min-height: 56px;
+  margin-bottom: 8px;
+}
+
+.osk-suggest.is-empty { visibility: hidden; }
+
+.osk-suggestion {
+  flex: 1 1 0;
+  max-width: none;
+  height: 56px;
+  font-size: clamp(18px, 1.4vw, 24px);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.osk-suggestion.is-fix { font-weight: 700; border-color: var(--accent); }

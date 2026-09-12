@@ -7,6 +7,8 @@
  * width unless ?osk=1 forces it on.
  */
 
+import { loadDictionary, refreshLearned, suggest } from './spell.js';
+
 const LETTERS = [
   ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -43,11 +45,19 @@ export function initKeyboard({ minWidth = 1100 } = {}) {
 
   // Pointerdown, not click: never let the keyboard steal focus from the field.
   root.addEventListener('pointerdown', (ev) => {
+    const pick = ev.target.closest('[data-suggest]');
+    if (pick) {
+      ev.preventDefault();
+      applySuggestion(pick.dataset.suggest);
+      return;
+    }
     const key = ev.target.closest('[data-key]');
     if (!key) return;
     ev.preventDefault();
     press(key.dataset.key);
   });
+
+  loadDictionary();
 
   document.addEventListener('focusin', (ev) => {
     const el = ev.target;
@@ -66,14 +76,20 @@ export const keyboardEnabled = () => enabled;
 
 export function show(el) {
   if (!enabled || !root) return;
+  if (target && target !== el) target.removeEventListener('input', updateSuggestions);
   target = el;
+  target.addEventListener('input', updateSuggestions);
   root.classList.add('is-open');
   root.setAttribute('aria-hidden', 'false');
   document.body.classList.add('osk-open');
+  // The board's own vocabulary may have grown since last time.
+  refreshLearned().then(updateSuggestions).catch(() => {});
+  updateSuggestions();
 }
 
 export function hide() {
   if (!root) return;
+  if (target) target.removeEventListener('input', updateSuggestions);
   target = null;
   shift = false;
   symbols = false;
@@ -81,6 +97,42 @@ export function hide() {
   root.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('osk-open');
   render();
+}
+
+// ---------------------------------------------------------------- suggestions
+
+/** The word being typed: the run of letters just before the caret. */
+function currentWord() {
+  if (!target) return null;
+  const caret = target.selectionStart ?? target.value.length;
+  const match = target.value.slice(0, caret).match(/[A-Za-z']+$/);
+  if (!match) return null;
+  return { word: match[0], start: caret - match[0].length, end: caret };
+}
+
+function updateSuggestions() {
+  const strip = root?.querySelector('.osk-suggest');
+  if (!strip) return;
+  const cur = currentWord();
+  const items = cur ? suggest(cur.word) : [];
+  strip.innerHTML = items
+    .map(
+      (s) => `<button type="button" class="osk-key osk-suggestion ${s.fix ? 'is-fix' : ''}"
+                data-suggest="${s.word.replace(/"/g, '&quot;')}">${s.word}</button>`
+    )
+    .join('');
+  strip.classList.toggle('is-empty', !items.length);
+}
+
+function applySuggestion(word) {
+  const cur = currentWord();
+  if (!cur || !target) return;
+  target.setRangeText(`${word} `, cur.start, cur.end, 'end');
+  target.dispatchEvent(new Event('input', { bubbles: true }));
+  if (shift) {
+    shift = false;
+    render();
+  }
 }
 
 function press(key) {
@@ -136,7 +188,9 @@ function render() {
   const rows = symbols ? SYMBOLS : LETTERS;
   const cap = (c) => (shift && !symbols ? c.toUpperCase() : c);
 
+  const strip = root.querySelector('.osk-suggest')?.innerHTML || '';
   root.innerHTML = `
+    <div class="osk-suggest is-empty">${strip}</div>
     <div class="osk-rows">
       ${rows
         .map(

@@ -8,6 +8,7 @@ import { mealsRouter } from './routes/meals.js';
 import { notesRouter } from './routes/notes.js';
 import { calendarRouter } from './routes/calendar.js';
 import { doodleRouter } from './routes/doodle.js';
+import { spellRouter } from './routes/spell.js';
 import { systemRouter } from './routes/system.js';
 import { startScheduler } from './sync/scheduler.js';
 
@@ -28,6 +29,7 @@ app.use('/api/meals', mealsRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/calendar', calendarRouter);
 app.use('/api/doodle', doodleRouter);
+app.use('/api/spell', spellRouter);
 app.use('/api', systemRouter);
 
 app.use(express.static(path.join(ROOT, 'public'), { maxAge: 0 }));

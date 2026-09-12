@@ -5,6 +5,7 @@
  */
 import { onChannel } from './sse.js';
 import { confirmAction } from './ui.js';
+import { attachInk } from './ink.js';
 
 const W = 1920;
 const H = 1080;
@@ -31,7 +32,6 @@ let thumbImg = null;
 let color = COLORS[0][0];
 let size = 6;
 let eraser = false;
-let drawing = false;
 let dirty = false;
 let saveTimer = null;
 let lastKnownUpdate = 0;
@@ -105,46 +105,13 @@ function scheduleSave() {
   saveTimer = setTimeout(save, 900);
 }
 
-function point(ev) {
-  const rect = canvas.getBoundingClientRect();
-  return {
-    x: ((ev.clientX - rect.left) / rect.width) * W,
-    y: ((ev.clientY - rect.top) / rect.height) * H,
-  };
-}
+let ink = null;
 
 function bindDrawing() {
-  canvas.addEventListener('pointerdown', (ev) => {
-    if (ev.button && ev.button !== 0) return;
-    drawing = true;
-    canvas.setPointerCapture(ev.pointerId);
-    const p = point(ev);
-    ctx.strokeStyle = eraser ? '#ffffff' : color;
-    ctx.lineWidth = eraser ? 48 : size;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y);
-    // A tap with no movement should still leave a dot.
-    ctx.lineTo(p.x + 0.01, p.y);
-    ctx.stroke();
+  ink = attachInk(canvas, {
+    style: () => ({ color: eraser ? '#ffffff' : color, width: eraser ? 48 : size }),
+    onStrokeEnd: scheduleSave,
   });
-
-  canvas.addEventListener('pointermove', (ev) => {
-    if (!drawing) return;
-    const p = point(ev);
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-  });
-
-  const stop = () => {
-    if (!drawing) return;
-    drawing = false;
-    scheduleSave();
-  };
-  canvas.addEventListener('pointerup', stop);
-  canvas.addEventListener('pointercancel', stop);
-  canvas.addEventListener('pointerleave', stop);
 }
 
 function toolbarHtml() {
@@ -257,7 +224,7 @@ export function initDoodle() {
     if (box.hidden) {
       const { thumb } = await fetch('/api/doodle/thumb').then((r) => r.json());
       setThumb(thumb);
-    } else if (!drawing && !dirty) {
+    } else if (!ink?.drawing && !dirty) {
       await loadFromServer();
     }
   });

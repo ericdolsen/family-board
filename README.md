@@ -290,3 +290,22 @@ board (see above).
 - No drag-to-reorder anywhere (the `position` column is there for it). Dragging
   on an IR frame is unreliable, so reordering will need a different gesture.
 - The drawing canvas is basic: one pen width, one colour, an eraser.
+
+### Spelling help on the on-screen keyboard
+
+A suggestion strip sits above the keys, like a phone keyboard: completions
+for the word being typed, and — when the word isn't in the dictionary — the
+closest known words first, emphasised. Tapping one replaces the word. It
+never auto-corrects and never flags anything, because half the words on a
+family board are names.
+
+The dictionary is `public/dict/en-base.txt` (common words, one per line,
+most frequent first) merged with everything the board has already seen —
+list items, event titles, notes, and the family's names from `config.json` —
+which always win. Phones use their own native keyboard and are unaffected.
+
+### Drawing on a real touch panel
+
+Strokes are tracked per pointer (`public/js/ink.js`). On a big capacitive
+screen a resting palm or a second finger is normal, and anything that
+assumes one pointer at a time turns lines into dots.
