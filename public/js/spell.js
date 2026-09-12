@@ -14,12 +14,23 @@ const display = new Map();  // lowercase -> preferred casing
 const byLength = new Map(); // length -> lowercase words
 
 let loading = null;
+const baseWords = new Set(); // lowercase words from the shipped list
+
+/**
+ * A learned word keeps its casing only when the base list doesn't know it —
+ * that's what makes "Taliesin" a name and "The" (from an event title) just
+ * "the".
+ */
+function displayForm(form) {
+  const key = form.toLowerCase();
+  return baseWords.has(key) ? key : form;
+}
 
 function addWord(form, r) {
   const key = form.toLowerCase();
   if (rank.has(key)) return;
   rank.set(key, r);
-  display.set(key, form);
+  display.set(key, displayForm(form));
   words.push(key);
   if (!byLength.has(key.length)) byLength.set(key.length, []);
   byLength.get(key.length).push(key);
@@ -32,9 +43,11 @@ export function loadDictionary() {
       fetch('/api/spell/learned').then((r) => r.json()).catch(() => []),
       fetch('/dict/en-base.txt').then((r) => r.text()).catch(() => ''),
     ]);
+    const baseList = base.split(/\s+/).filter(Boolean);
+    for (const w of baseList) baseWords.add(w.toLowerCase());
     let r = 0;
     for (const w of learned) addWord(w, r++);
-    for (const w of base.split(/\s+/)) if (w) addWord(w, r++);
+    for (const w of baseList) addWord(w, r++);
   })();
   return loading;
 }
@@ -49,7 +62,7 @@ export async function refreshLearned() {
       addWord(w, -learned.length + i);
     } else {
       rank.set(key, Math.min(rank.get(key), -learned.length + i));
-      if (/^[A-Z]/.test(w)) display.set(key, w);
+      if (/^[A-Z]/.test(w) && !baseWords.has(key)) display.set(key, w);
     }
   });
 }
@@ -116,7 +129,8 @@ export function suggest(typed, limit = 4) {
   if (!known && w.length >= 3) {
     const max = w.length >= 6 ? 2 : 1;
     const candidates = [];
-    for (let len = w.length - max; len <= w.length + max; len++) {
+    // Never "correct" to a 2-letter token: the base list has a few ("th").
+    for (let len = Math.max(3, w.length - max); len <= w.length + max; len++) {
       for (const key of byLength.get(len) || []) {
         const d = distance(w, key, max);
         if (d !== Infinity) candidates.push({ key, d, r: rank.get(key) });
