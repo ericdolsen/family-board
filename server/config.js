@@ -45,6 +45,7 @@ const DEFAULTS = {
     nightDimPercent: 45,
     idleAfterMinutes: 0,
     nightlyReloadAt: '04:00',
+    debugTouch: false,
   },
   behavior: {
     clearDoneTodosAfterHours: 24,

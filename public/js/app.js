@@ -226,7 +226,7 @@ async function main() {
   startClock();
   setupTheme();
   scheduleNightlyReload();
-  initDoodle();
+  initDoodle({ debugTouch: config.display.debugTouch });
 
   // Kid-proofing: a wall board should never end up somewhere it can't come back
   // from. Chromium kiosk already blocks most of this; belt and braces.

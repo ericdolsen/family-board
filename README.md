@@ -308,4 +308,13 @@ which always win. Phones use their own native keyboard and are unaffected.
 
 Strokes are tracked per pointer (`public/js/ink.js`). On a big capacitive
 screen a resting palm or a second finger is normal, and anything that
-assumes one pointer at a time turns lines into dots.
+assumes one pointer at a time turns lines into dots. A touch that lands
+within a quarter second and a short distance of where the last one lifted is
+stitched onto the same stroke, which covers controllers that report a moving
+finger as a burst of separate touches.
+
+If drawing still misbehaves on a particular panel, set
+`display.debugTouch: true` in `config.json` (no restart needed), open the
+doodle, draw a few strokes, and read what the panel actually sent at
+`http://<pi-ip>:8080/api/debug/touch` from any browser on the LAN. Set it
+back to `false` afterwards; the log lives in `data/touch-debug.log`.

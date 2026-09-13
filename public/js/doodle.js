@@ -106,11 +106,27 @@ function scheduleSave() {
 }
 
 let ink = null;
+let debugTouch = false;
+
+// Diagnostics: batch the pointer records and post them every couple of
+// seconds so they can be read at /api/debug/touch from any browser.
+const debugQueue = [];
+let debugTimer = null;
+function debugRecord(record) {
+  debugQueue.push(record);
+  if (debugTimer) return;
+  debugTimer = setTimeout(() => {
+    debugTimer = null;
+    const events = debugQueue.splice(0);
+    fetch('/api/debug/touch', { method: 'POST', headers, body: JSON.stringify({ events }) }).catch(() => {});
+  }, 2000);
+}
 
 function bindDrawing() {
   ink = attachInk(canvas, {
     style: () => ({ color: eraser ? '#ffffff' : color, width: eraser ? 48 : size }),
     onStrokeEnd: scheduleSave,
+    debug: debugTouch ? debugRecord : null,
   });
 }
 
@@ -198,7 +214,8 @@ export async function close() {
   document.body.classList.remove('doodle-open');
 }
 
-export function initDoodle() {
+export function initDoodle({ debugTouch: debugFlag = false } = {}) {
+  debugTouch = Boolean(debugFlag);
   button = document.getElementById('doodle-button');
   thumbImg = button.querySelector('img');
 
